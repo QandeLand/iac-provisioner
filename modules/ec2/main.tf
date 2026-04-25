@@ -4,7 +4,6 @@
 # finds the latest Ubuntu 22.04 AMI automatically,
 # and deploys the instance into the public subnet.
 
-
 resource "aws_security_group" "ec2" {
   name        = "${var.project}-${var.environment}-ec2-sg"
   description = "Security group for EC2 instance"
@@ -19,19 +18,19 @@ resource "aws_security_group" "ec2" {
   }
 
   ingress {
-    description = "HTTP access"
+    description = "HTTP access - intentionally public for web server"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-ingress-sgr
   }
 
   egress {
-    description = "Allow all outbound traffic"
+    description = "Allow all outbound - servers need internet to download packages"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-egress-sgr
   }
 
   tags = {
