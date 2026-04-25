@@ -1,6 +1,6 @@
 # What Is Build
 # This module provisions an EC2 instance inside the VPC.
-# It creates a security group allowing SSH and HTTP access,
+# It creates a security group restricting SSH to my IP only,
 # finds the latest Ubuntu 22.04 AMI automatically,
 # and deploys the instance into the public subnet.
 
@@ -11,11 +11,11 @@ resource "aws_security_group" "ec2" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "SSH access"
+    description = "SSH access from my IP only"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["94.234.84.227/32"]
   }
 
   ingress {
@@ -27,6 +27,7 @@ resource "aws_security_group" "ec2" {
   }
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -55,6 +56,14 @@ resource "aws_instance" "main" {
   subnet_id     = var.subnet_id
 
   vpc_security_group_ids = [aws_security_group.ec2.id]
+
+  metadata_options {
+    http_tokens = "required"
+  }
+
+  root_block_device {
+    encrypted = true
+  }
 
   tags = {
     Name        = "${var.project}-${var.environment}-ec2"
