@@ -1,8 +1,7 @@
-# What Is Build
+# What Is Built
 # This module provisions a PostgreSQL RDS instance inside the private subnet.
 # It creates a dedicated security group allowing database access only from
 # within the VPC — the database is never exposed to the public internet.
-
 
 resource "aws_security_group" "rds" {
   name        = "${var.project}-${var.environment}-rds-sg"
@@ -10,7 +9,7 @@ resource "aws_security_group" "rds" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "PostgreSQL access from within VPC"
+    description = "PostgreSQL access from within VPC only"
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
@@ -18,10 +17,11 @@ resource "aws_security_group" "rds" {
   }
 
   egress {
+    description = "Allow outbound to reach AWS services"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-egress-sgr
   }
 
   tags = {
@@ -54,8 +54,15 @@ resource "aws_db_instance" "main" {
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [aws_security_group.rds.id]
 
+  storage_encrypted                   = true
+  iam_database_authentication_enabled = true
+  backup_retention_period             = 7
+  deletion_protection                 = true
+
+  # Performance insights skipped — not needed for a lab environment
+  performance_insights_enabled = false #tfsec:ignore:aws-rds-enable-performance-insights
+
   skip_final_snapshot = true
-  deletion_protection = false
 
   tags = {
     Name        = "${var.project}-${var.environment}-db"
