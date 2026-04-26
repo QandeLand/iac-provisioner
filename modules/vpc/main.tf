@@ -5,6 +5,8 @@
 # EC2 lives in the public subnet, RDS stays in the private one — 
 # that way the database is never directly exposed to the internet.
 
+data "aws_region" "current" {}
+
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
@@ -40,11 +42,24 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "private" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = cidrsubnet(var.vpc_cidr, 8, 2)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, 2)
+  availability_zone = "${data.aws_region.current.name}a"
 
   tags = {
-    Name        = "${var.project}-${var.environment}-private-subnet"
+    Name        = "${var.project}-${var.environment}-private-subnet-a"
+    Environment = var.environment
+  }
+}
+
+# Second private subnet in a different AZ — required by RDS
+resource "aws_subnet" "private_b" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, 3)
+  availability_zone = "${data.aws_region.current.name}b"
+
+  tags = {
+    Name        = "${var.project}-${var.environment}-private-subnet-b"
     Environment = var.environment
   }
 }
