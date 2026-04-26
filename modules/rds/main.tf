@@ -32,7 +32,7 @@ resource "aws_security_group" "rds" {
 
 resource "aws_db_subnet_group" "main" {
   name       = "${var.project}-${var.environment}-db-subnet-group"
-  subnet_ids = [var.private_subnet_id]
+  subnet_ids = [var.private_subnet_id, var.private_subnet_b_id]
 
   tags = {
     Name        = "${var.project}-${var.environment}-db-subnet-group"
