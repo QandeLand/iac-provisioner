@@ -3,7 +3,6 @@
 # Database credentials are marked as sensitive so Terraform
 # never prints them in logs or terminal output.
 
-
 variable "environment" {
   description = "Environment name (dev, staging, prod)"
   type        = string
@@ -26,7 +25,12 @@ variable "vpc_id" {
 }
 
 variable "private_subnet_id" {
-  description = "Private subnet ID where RDS will be deployed"
+  description = "First private subnet ID (AZ-a)"
+  type        = string
+}
+
+variable "private_subnet_b_id" {
+  description = "Second private subnet ID (AZ-b) — required by RDS for multi-AZ coverage"
   type        = string
 }
 
