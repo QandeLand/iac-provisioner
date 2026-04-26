@@ -16,7 +16,7 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "${path.module}/../../modules/vpc"
+  source = "../../modules/vpc"
 
   vpc_cidr    = var.vpc_cidr
   environment = var.environment
@@ -24,7 +24,7 @@ module "vpc" {
 }
 
 module "ec2" {
-  source = "${path.module}/../../modules/ec2"
+  source = "../../modules/ec2"
 
   environment   = var.environment
   project       = var.project
@@ -34,13 +34,14 @@ module "ec2" {
 }
 
 module "rds" {
-  source = "${path.module}/../../modules/rds"
+  source = "../../modules/rds"
 
   environment       = var.environment
   project           = var.project
   instance_class    = var.instance_class
   vpc_id            = module.vpc.vpc_id
   private_subnet_id = module.vpc.private_subnet_id
+  private_subnet_b_id = module.vpc.private_subnet_b_id
   db_name           = var.db_name
   db_username       = var.db_username
   db_password       = var.db_password
