@@ -56,7 +56,7 @@ resource "aws_db_instance" "main" {
 
   storage_encrypted                   = true
   iam_database_authentication_enabled = true
-  backup_retention_period             = 7
+  backup_retention_period             = 0
   deletion_protection                 = true
 
   # Performance insights skipped — not needed for a lab environment
