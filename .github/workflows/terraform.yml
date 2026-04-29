@@ -40,7 +40,7 @@ jobs:
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
       - name: Terragrunt Plan Dev
         working-directory: environments/dev
-        run: terragrunt plan --non-interactive
+        run: terragrunt plan --terragrunt-no-auto-init
   apply-dev:
     name: Apply to Dev
     runs-on: ubuntu-latest
@@ -61,4 +61,4 @@ jobs:
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
       - name: Terragrunt Apply Dev
         working-directory: environments/dev
-        run: terragrunt apply --non-interactive -auto-approve
+        run: terragrunt apply -auto-approve
