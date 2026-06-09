@@ -1,8 +1,28 @@
 # IaC Multi-Environment Provisioner
 
-**Author:** Qandeel Javed | [GitHub](https://github.com/QandeLand) | Stockholm, Sweden
+![Terraform](https://img.shields.io/badge/Terraform-IaC-7B42BC?logo=terraform&logoColor=white)
+![Terragrunt](https://img.shields.io/badge/Terragrunt-DRY-3D6B8C?logo=gruntwork&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?logo=amazonaws&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI/CD-2088FF?logo=githubactions&logoColor=white)
+![tfsec](https://img.shields.io/badge/tfsec-Security-1904DA?logo=aqua&logoColor=white)
 
-A production-style Infrastructure as Code project that provisions dev, staging, and production AWS environments from a single Terraform codebase using Terragrunt. Every infrastructure change goes through a security scan before anything is applied.
+A production-style Infrastructure as Code project that provisions dev, staging,
+and production AWS environments from a single Terraform codebase using Terragrunt.
+Every infrastructure change goes through a security scan before anything is applied.
+
+---
+## Key highlights
+
+- **Zero code duplication** — dev, staging, and prod provisioned from a single
+  Terraform codebase using Terragrunt
+- **15 tfsec security issues identified and resolved** before any infrastructure
+  was deployed to AWS
+- **Security gate in CI** — no infrastructure change is applied without passing
+  tfsec scan first
+- **Remote state with locking** — S3 backend with DynamoDB locking prevents
+  concurrent Terraform runs
+- **Manual approval gate** — production apply requires explicit approval before
+  any changes are made
 
 ---
 
@@ -11,7 +31,8 @@ A production-style Infrastructure as Code project that provisions dev, staging, 
 - Writing reusable Terraform modules for VPC, EC2, and RDS
 - Using Terragrunt to manage multiple environments without duplicating code
 - Remote state stored in S3 with DynamoDB locking to prevent concurrent conflicts
-- Security scanning with tfsec integrated as a CI gate — no infrastructure change is applied without passing security checks
+- Security scanning with tfsec integrated as a CI gate — no infrastructure
+  change is applied without passing security checks
 - GitHub Actions pipeline with plan on PR and apply on merge
 - 15 tfsec security issues identified and resolved before any deployment
 
@@ -52,15 +73,16 @@ iac-provisioner/
 │   └── prod/
 │       └── terragrunt.hcl
 └── .github/
-    └── workflows/
-        └── terraform.yml     # CI/CD pipeline
+└── workflows/
+└── terraform.yml     # CI/CD pipeline
 ```
 
 ---
 
 ## How it works
 
-Modules are written once and reused across all three environments. Each environment only defines what is different — instance size, CIDR block, database name. Terragrunt handles the shared config like remote state backend and AWS region.
+Modules are written once and reused across all three environments. Each environment only defines what is different — instance size, CIDR block, database name.
+Terragrunt handles the shared config like remote state backend and AWS region.
 
 The CI/CD pipeline runs on every pull request and merge:
 
@@ -68,7 +90,6 @@ The CI/CD pipeline runs on every pull request and merge:
 PR opened
 → tfsec security scan (fail if critical issues found)
 → terraform plan (show what will change)
-
 PR merged to main
 → terragrunt apply to dev automatically
 ```
@@ -134,3 +155,19 @@ terragrunt apply
 # Destroy when done — always run this after each session
 terragrunt destroy
 ```
+---
+
+## What I learned
+
+- How Terragrunt eliminates code duplication across environments — one module,
+  three environments, zero repetition
+- Why remote state with locking matters — without DynamoDB locking, concurrent
+  Terraform runs can corrupt state
+- How tfsec catches real security issues before deployment — encryption,
+  IAM auth, metadata service hardening are easy to miss without a scanner
+- How to structure reusable Terraform modules with clean inputs and outputs —
+  each module independently testable
+- Why a manual approval gate before production apply is critical —
+  automation is great until it deletes prod
+- How to build a CI pipeline that treats infrastructure changes like code —
+  scan, plan, review, apply
